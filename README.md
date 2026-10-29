@@ -6,9 +6,9 @@ One trusted view of portfolio health, early-warning KRIs, model population drift
 
 > Independent portfolio project on public data (LendingClub loans, 2014-2018). No employer, client or confidential data. Risk-appetite thresholds are illustrative.
 
-[![dbt CI](https://github.com/YOUR-USERNAME/credit-risk-control-tower/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR-USERNAME/credit-risk-control-tower/actions/workflows/ci.yml)
+[![dbt CI](https://github.com/ar-raj95/credit-risk-control-tower/actions/workflows/ci.yml/badge.svg)](https://github.com/ar-raj95/credit-risk-control-tower/actions/workflows/ci.yml)
 
-**Demo video (2 min):** *add link* · **dbt docs and lineage:** *https://YOUR-USERNAME.github.io/credit-risk-control-tower* · **Report PDF:** `powerbi/report.pdf`
+**Demo video (2 min):** *add link* · **dbt docs and lineage:** *https://ar-raj95.github.io/credit-risk-control-tower* · **Report PDF:** `powerbi/report.pdf`
 
 ---
 
