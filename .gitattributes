@@ -1,0 +1,4 @@
+# GitHub ignores SQL in its language bar by default. Count it, since SQL is most of this project.
+*.sql linguist-detectable=true
+# Don't count generated or documentation files.
+docs/** linguist-documentation
