@@ -1,0 +1,12 @@
+metric,display_folder,definition,formula,source_model,owner,refresh
+Loan Count,Exposure,Number of loans issued,COUNT(loan_id),fct_loans,Credit Risk Analytics,Monthly
+Funded Amount,Exposure,Total principal funded at origination,SUM(loan_amount),fct_loans,Credit Risk Analytics,Monthly
+Avg Loan Size,Exposure,Average funded amount per loan,Funded Amount / Loan Count,fct_loans,Credit Risk Analytics,Monthly
+Exposure Share,Exposure,Share of total funded amount in the selected segment,Segment Funded Amount / Total Funded Amount,fct_loans,Credit Risk Analytics,Monthly
+Default Rate,Performance,Share of closed loans that defaulted; live loans excluded so they are not counted as good,Defaulted Loans / Closed Loans,fct_loans,Head of Credit Risk,Monthly
+Delinquency Rate,Performance,Share of active loans 16 to 120 days past due,Delinquent Loans / Active Loans,fct_loans,Head of Credit Risk,Monthly
+Net Loss Rate,Performance,Principal not recovered on defaulted loans as a share of funded amount,Loss Amount / Funded Amount,fct_loans,Head of Credit Risk,Monthly
+Avg FICO,Credit quality,Average FICO midpoint at origination,AVG(fico_score),fct_loans,Credit Risk Analytics,Monthly
+Avg DTI,Credit quality,Average debt-to-income ratio at origination,AVG(dti),fct_loans,Credit Risk Analytics,Monthly
+PSI,Stability,Population stability index of a feature versus the 2015-16 baseline,SUM((Current% - Base%) * LN(Current% / Base%)) over 10 baseline deciles,fct_psi,Model Risk,Quarterly
+DQ Pass Rate,Data quality,Share of records that pass a data quality rule,1 - Failed Records / Records,fct_dq_results,Data Governance,Monthly

@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: fct_dq_results
+    description: Data quality results by rule and issue quarter. Drives the DQ Scorecard page.
+    data_tests:
+      - expression_is_true:
+          arguments:
+            expression: "failed between 0 and records"
+    columns:
+      - {name: rule_id, data_tests: [not_null, {relationships: {arguments: {to: ref('dq_rule_catalog'), field: rule_id}}}]}
+      - {name: pass_rate, data_tests: [{accepted_range: {arguments: {min_value: 0, max_value: 1}}}]}
+
+  - name: fct_psi_bins
+    description: PSI contribution per baseline decile, feature and quarter. Drill-through detail for the Stability page.
+
+  - name: fct_psi
+    description: "{{ doc('psi') }}"
+    columns:
+      - {name: psi, data_tests: [not_null, {accepted_range: {arguments: {min_value: 0}}}]}
+      - name: psi_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Stable', 'Moderate shift', 'Significant shift']
+
+  - name: fct_kri_quarterly
+    description: >
+      Portfolio KRIs by issue quarter with RAG against risk_appetite. The
+      reconciliation anchor: Power BI measures at quarter level must match it.
+    columns:
+      - name: matured_share
+        description: Share of the vintage's loans whose full term ended by the data cutoff.
+      - name: is_right_censored
+        description: "{{ doc('right_censoring') }} True when matured_share is below 0.5."
+      - name: rag
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Red', 'Amber', 'Green', 'n/a']
+      - name: kri_value
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0, max_value: 1}

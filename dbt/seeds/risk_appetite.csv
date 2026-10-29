@@ -1,0 +1,6 @@
+kri,kri_label,amber,red,direction,unit,owner,note
+default_rate,Observed default rate,0.15,0.20,higher_is_worse,ratio,Head of Credit Risk,Illustrative threshold; agree with risk owner
+delinquency_rate,Delinquency rate,0.03,0.05,higher_is_worse,ratio,Head of Credit Risk,Illustrative threshold; agree with risk owner
+net_loss_rate,Net loss rate,0.08,0.10,higher_is_worse,ratio,Head of Credit Risk,Illustrative threshold; agree with risk owner
+psi,Population stability index,0.10,0.25,higher_is_worse,index,Model Risk,Industry convention for PSI bands
+dq_pass_rate,Data quality pass rate,0.98,0.95,lower_is_worse,ratio,Data Governance,Illustrative threshold; agree with data owner

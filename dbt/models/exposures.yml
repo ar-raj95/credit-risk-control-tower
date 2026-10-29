@@ -1,0 +1,29 @@
+version: 2
+
+exposures:
+  - name: credit_risk_control_tower_report
+    label: Credit Risk Control Tower (Power BI)
+    type: dashboard
+    maturity: medium
+    url: https://github.com/YOUR-USERNAME/credit-risk-control-tower/tree/main/powerbi
+    description: >
+      Seven-page Power BI report: Executive Summary, Composition, Vintage,
+      Segment Drill-down, Population Stability, DQ Scorecard, Metric Dictionary.
+    owner:
+      name: Credit Risk Analytics (portfolio project)
+      email: owner@example.com
+    depends_on:
+      - ref('fct_loans')
+      - ref('dim_date')
+      - ref('dim_quarter')
+      - ref('dim_grade')
+      - ref('dim_purpose')
+      - ref('dim_state')
+      - ref('dim_fico_band')
+      - ref('dim_dti_band')
+      - ref('fct_kri_quarterly')
+      - ref('fct_psi')
+      - ref('fct_psi_bins')
+      - ref('fct_dq_results')
+      - ref('risk_appetite')
+      - ref('metric_dictionary')

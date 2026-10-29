@@ -1,0 +1,52 @@
+name: credit_risk_control_tower
+version: "1.0.0"
+config-version: 2
+profile: credit_risk_control_tower
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+clean-targets: ["target", "dbt_packages", "logs"]
+
+vars:
+  start_year: 2014
+  data_cutoff_date: "2018-12-31"     # last issue month in the Kaggle extract
+  psi_baseline_years: [2015, 2016]   # model "development" population
+  psi_features: ["fico_score", "dti", "annual_income", "loan_amount", "interest_rate_pct"]
+  psi_bins: 10
+  export_path: "../data/marts"       # Parquet files Power BI reads
+
+on-run-end:
+  - "{{ export_to_parquet(results) }}"
+
+models:
+  credit_risk_control_tower:
+    +group: credit_risk
+    staging:
+      +schema: staging
+      +materialized: view
+      +access: protected
+    intermediate:
+      +schema: intermediate
+      +materialized: table
+      +access: protected
+    marts:
+      +schema: marts
+      +materialized: table
+      +access: public
+      +meta:
+        export: true
+
+seeds:
+  credit_risk_control_tower:
+    +schema: reference
+    loan_status_map:
+      +column_types: {is_default: integer, is_closed: integer, is_active: integer, is_delinquent: integer}
+    risk_appetite:
+      +meta: {export: true}
+    metric_dictionary:
+      +meta: {export: true}
+    dq_rule_catalog:
+      +meta: {export: true}

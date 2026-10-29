@@ -1,0 +1,7 @@
+version: 2
+
+groups:
+  - name: credit_risk
+    owner:
+      name: Credit Risk Analytics (portfolio project)
+      email: owner@example.com

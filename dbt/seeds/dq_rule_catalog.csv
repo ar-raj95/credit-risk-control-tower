@@ -1,0 +1,13 @@
+rule_id,dimension,field,severity,description,fail_condition,remediation_owner
+DQ01,Completeness,annual_income,High,Annual income is missing,annual_income is null,Origination data owner
+DQ02,Completeness,dti,High,Debt-to-income ratio is missing,dti is null,Origination data owner
+DQ03,Completeness,emp_length,Medium,Employment length is missing,emp_length is null,Origination data owner
+DQ04,Completeness,revol_util,Medium,Revolving utilization is missing,revol_util_pct is null,Bureau data owner
+DQ05,Validity,annual_income,High,Annual income is zero or negative,annual_income <= 0,Origination data owner
+DQ06,Validity,dti,High,DTI is outside 0 to 100,dti < 0 or dti > 100,Origination data owner
+DQ07,Validity,fico_range_low,High,FICO is outside 300 to 850,fico_range_low not between 300 and 850,Bureau data owner
+DQ08,Validity,interest_rate_pct,Medium,Interest rate is outside 0 to 40 percent,interest_rate_pct not between 0 and 40,Pricing data owner
+DQ09,Validity,revol_util,Low,Revolving utilization is above 150 percent,revol_util_pct > 150,Bureau data owner
+DQ10,Uniqueness,loan_id,High,Loan id appears more than once,loan_id_occurrences > 1,Platform data engineering
+DQ11,Consistency,fico_range,Medium,FICO high is below FICO low,fico_range_high < fico_range_low,Bureau data owner
+DQ12,Validity,state_code,Medium,State code is not a valid US state,state_name is null,Origination data owner

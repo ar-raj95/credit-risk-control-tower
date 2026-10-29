@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: int_loans_enriched
+    description: >
+      One row per unique loan with business rules applied: status flags from
+      the loan_status_map seed, FICO and DTI bands from seeds, principal loss
+      on defaults, and a maturity flag for right-censored vintages.
+    columns:
+      - name: loan_id
+        data_tests: [unique, not_null]
+      - name: is_default
+        description: 1 if the loan charged off or defaulted.
+        data_tests: [not_null]
+      - name: loss_amount
+        description: Funded amount minus principal received, defaulted loans only. Excludes recoveries.
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0}
+      - name: is_matured
+        description: 1 if issue date plus term is on or before the data cutoff. Default rates on immature vintages are understated.
+
+unit_tests:
+  - name: status_flags_loss_and_bands
+    description: Defaults carry principal loss, live loans carry none, and bands and maturity are assigned correctly.
+    model: int_loans_enriched
+    given:
+      - input: ref('stg_lendingclub__loans')
+        rows:
+          - {loan_id: 1, loan_amount: 10000, principal_received: 4000, loan_status: "Charged Off", fico_range_low: 690, fico_range_high: 694, dti: 9.5, term_months: 36, issue_date: "2014-03-01", _loaded_at: "2026-01-01 00:00:00"}
+          - {loan_id: 2, loan_amount: 8000, principal_received: 9000, loan_status: "Default", fico_range_low: 780, fico_range_high: 784, dti: 40, term_months: 60, issue_date: "2017-06-01", _loaded_at: "2026-01-01 00:00:00"}
+          - {loan_id: 3, loan_amount: 5000, principal_received: 1000, loan_status: "Late (31-120 days)", fico_range_low: 655, fico_range_high: 659, dti: 20, term_months: 36, issue_date: "2018-01-01", _loaded_at: "2026-01-01 00:00:00"}
+      - input: ref('loan_status_map')
+        format: csv
+        rows: |
+          loan_status,status_group,is_default,is_closed,is_active,is_delinquent
+          Charged Off,Closed - Default,1,1,0,0
+          Default,Closed - Default,1,1,0,0
+          Late (31-120 days),Active - Delinquent,0,0,1,1
+      - input: ref('fico_bands')
+        format: csv
+        rows: |
+          fico_band,lower_bound,upper_bound,sort_order
+          <660,0,660,1
+          660-699,660,700,2
+          780+,780,1000,5
+      - input: ref('dti_bands')
+        format: csv
+        rows: |
+          dti_band,lower_bound,upper_bound,sort_order
+          0-10,-1000000,10,1
+          20-30,20,30,3
+          40+,40,1000000,5
+    expect:
+      rows:
+        - {loan_id: 1, is_default: 1, is_delinquent: 0, loss_amount: 6000, fico_band: "660-699", dti_band: "0-10", issue_quarter: "2014 Q1", is_matured: 1}
+        - {loan_id: 2, is_default: 1, is_delinquent: 0, loss_amount: 0, fico_band: "780+", dti_band: "40+", issue_quarter: "2017 Q2", is_matured: 0}
+        - {loan_id: 3, is_default: 0, is_delinquent: 1, loss_amount: 0, fico_band: "<660", dti_band: "20-30", issue_quarter: "2018 Q1", is_matured: 0}

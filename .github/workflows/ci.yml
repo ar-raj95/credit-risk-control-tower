@@ -1,0 +1,60 @@
+# Runs on every pull request and push to main: build the pipeline on a
+# synthetic fixture, run every test, lint SQL. Fails the PR if any gate fails.
+name: dbt CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      DUCKDB_PATH: ${{ github.workspace }}/data/warehouse.duckdb
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements.txt sqlfluff==4.4.0 sqlfluff-templater-dbt==4.4.0
+      - name: Create synthetic fixture and load raw layer
+        run: |
+          python ingest/make_fixture.py --rows 5000 --out data/fixture.csv
+          python ingest/load_raw.py --input data/fixture.csv
+      - name: dbt build (models, seeds, data tests, unit tests)
+        working-directory: dbt
+        run: dbt build --fail-fast
+      - name: Lint SQL
+        run: sqlfluff lint dbt/models dbt/tests
+      - name: Generate docs
+        working-directory: dbt
+        run: dbt docs generate --static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dbt-docs
+          path: dbt/target/static_index.html
+
+  publish-docs:
+    # Publishes the dbt docs site (lineage + metric definitions) to GitHub Pages.
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dbt-docs
+      - run: mkdir site && mv static_index.html site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

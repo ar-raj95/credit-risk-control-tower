@@ -1,0 +1,47 @@
+version: 2
+
+seeds:
+  - name: loan_status_map
+    description: Maps each LendingClub status to the flags used in every KRI. A new status in the source fails the relationships test until it is mapped here.
+    columns:
+      - name: loan_status
+        data_tests: [unique, not_null]
+  - name: risk_appetite
+    description: KRI thresholds. Illustrative values; in a real engagement these are agreed with the risk owner and changed by pull request, never in DAX.
+    columns:
+      - name: kri
+        data_tests: [unique, not_null]
+      - name: direction
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['higher_is_worse', 'lower_is_worse']
+  - name: dq_rule_catalog
+    description: One row per data quality rule. fail_condition is SQL evaluated against staging by fct_dq_results.
+    columns:
+      - name: rule_id
+        data_tests: [unique, not_null]
+      - name: dimension
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Completeness', 'Validity', 'Uniqueness', 'Consistency']
+      - name: severity
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['High', 'Medium', 'Low']
+  - name: metric_dictionary
+    description: Business definition of every metric in the report. Loaded into Power BI as the Metric Dictionary page.
+    columns:
+      - name: metric
+        data_tests: [unique, not_null]
+  - name: fico_bands
+    description: FICO band boundaries. Lower bound inclusive, upper bound exclusive.
+  - name: dti_bands
+    description: DTI band boundaries. Lower bound inclusive, upper bound exclusive.
+  - name: state_region
+    description: US states and DC with Census region. Region drives row-level security roles.
+    columns:
+      - name: state_code
+        data_tests: [unique, not_null]

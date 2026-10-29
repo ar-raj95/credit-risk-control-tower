@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_lendingclub__loans
+    description: >
+      Typed, renamed loans issued from var('start_year'). Duplicates and invalid
+      values are kept on purpose so fct_dq_results can measure them.
+    columns:
+      - name: loan_id
+        description: LendingClub loan id. Not deduplicated at this layer.
+        data_tests:
+          - not_null
+      - name: issue_date
+        description: First day of the issue month.
+        data_tests:
+          - not_null
+      - name: loan_status
+        description: Status as of the extract date.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('loan_status_map')
+                field: loan_status
+              config:
+                severity: error
+      - name: grade
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+      - name: dti
+        description: Debt-to-income ratio, in percent.
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+              config:
+                severity: warn

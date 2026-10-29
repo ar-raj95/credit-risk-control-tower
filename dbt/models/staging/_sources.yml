@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: lendingclub
+    description: >
+      LendingClub accepted loans 2007-2018Q4 (Kaggle, wordsforthewise), landed
+      by ingest/load_raw.py as text. Public data used as a proxy for a retail
+      lending portfolio.
+    schema: raw
+    loaded_at_field: _loaded_at
+    tables:
+      - name: lendingclub_loans
+        description: One row per loan as received. All columns are VARCHAR.
+        columns:
+          - name: id
+            description: LendingClub loan id. Footer rows in the file have text here.

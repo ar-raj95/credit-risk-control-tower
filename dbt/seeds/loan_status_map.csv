@@ -1,0 +1,10 @@
+loan_status,status_group,is_default,is_closed,is_active,is_delinquent
+Fully Paid,Closed - Paid,0,1,0,0
+Does not meet the credit policy. Status:Fully Paid,Closed - Paid,0,1,0,0
+Charged Off,Closed - Default,1,1,0,0
+Does not meet the credit policy. Status:Charged Off,Closed - Default,1,1,0,0
+Default,Closed - Default,1,1,0,0
+Current,Active - Performing,0,0,1,0
+In Grace Period,Active - Performing,0,0,1,0
+Late (16-30 days),Active - Delinquent,0,0,1,1
+Late (31-120 days),Active - Delinquent,0,0,1,1

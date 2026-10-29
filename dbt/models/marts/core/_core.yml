@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: fct_loans
+    description: One row per unique loan issued from 2014. Grain and keys are enforced by contract.
+    config:
+      contract: {enforced: true}
+    constraints:
+      - type: primary_key
+        columns: [loan_id]
+    columns:
+      - {name: loan_id, data_type: bigint, constraints: [{type: not_null}], data_tests: [unique]}
+      - {name: issue_date, data_type: date, constraints: [{type: not_null}],
+         data_tests: [{relationships: {arguments: {to: ref('dim_date'), field: date_day}}}]}
+      - {name: issue_quarter_key, data_type: integer}
+      - {name: grade, data_type: varchar,
+         data_tests: [{relationships: {arguments: {to: ref('dim_grade'), field: grade}}}]}
+      - {name: sub_grade, data_type: varchar}
+      - {name: purpose, data_type: varchar}
+      - {name: state_code, data_type: varchar,
+         data_tests: [{relationships: {arguments: {to: ref('dim_state'), field: state_code}}}]}
+      - {name: fico_band, data_type: varchar,
+         data_tests: [{relationships: {arguments: {to: ref('dim_fico_band'), field: fico_band}}}]}
+      - {name: dti_band, data_type: varchar,
+         data_tests: [{relationships: {arguments: {to: ref('dim_dti_band'), field: dti_band}}}]}
+      - {name: term_months, data_type: integer}
+      - {name: home_ownership, data_type: varchar}
+      - {name: verification_status, data_type: varchar}
+      - {name: status_group, data_type: varchar}
+      - {name: loan_amount, data_type: double, description: Funded amount at origination, USD.}
+      - {name: interest_rate_pct, data_type: double}
+      - {name: annual_income, data_type: double}
+      - {name: dti, data_type: double}
+      - {name: fico_score, data_type: double, description: Midpoint of the FICO range at origination.}
+      - {name: loss_amount, data_type: double, description: "{{ doc('loss_amount') }}"}
+      - {name: is_default, data_type: integer}
+      - {name: is_closed, data_type: integer}
+      - {name: is_active, data_type: integer}
+      - {name: is_delinquent, data_type: integer}
+      - {name: is_matured, data_type: integer, description: "{{ doc('right_censoring') }}"}
+    data_tests:
+      - expression_is_true:
+          arguments:
+            expression: "is_default <= is_closed and is_delinquent <= is_active and is_closed + is_active = 1"
+
+  - name: dim_date
+    description: Daily calendar. Mark as date table in Power BI.
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+  - name: dim_quarter
+    description: Quarter dimension linking quarter-grain facts (DQ, PSI, KRI).
+    columns:
+      - name: quarter_key
+        data_tests: [unique, not_null]
+  - name: dim_grade
+    columns:
+      - name: grade
+        data_tests: [unique, not_null]
+  - name: dim_purpose
+    columns:
+      - name: purpose
+        data_tests: [unique, not_null]
+  - name: dim_state
+    description: State with Census region for RLS. UNK holds invalid or missing codes (see DQ12).
+    columns:
+      - name: state_code
+        data_tests: [unique, not_null]
+  - name: dim_fico_band
+    columns:
+      - name: fico_band
+        data_tests: [unique, not_null]
+  - name: dim_dti_band
+    columns:
+      - name: dti_band
+        data_tests: [unique, not_null]
